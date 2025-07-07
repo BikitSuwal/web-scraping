@@ -1,17 +1,21 @@
 import requests
-from bs4 import BeautifulSoup
+import json
 
-url = requests.get("https://quotes.toscrape.com/")
+url = "https://remoteok.com/api"
 
-response = url
+headers = {
+    "User-Agent": "Mozilla/5.0"
+}
 
-soup = BeautifulSoup(response.text, "html.parser")
+response = requests.get(url, headers=headers)
 
-print("Title:",soup.title.string)
+if response.status_code == 200:
+    data = response.json()
 
-quotes = soup.find_all("div",class_='quote')
-for q in quotes:
-    text = q.find('span',class_='text').text
-    author = q.find('small',class_='author').text
-    print(f"{text}-{author}")
 
+    for job in data[1:]:
+        print(f"{job['position']} — {job['company']}")
+        print("Link:", job['url'])
+        print("-" * 40)
+else:
+    print("Failed to fetch data. Status code:", response.status_code)
